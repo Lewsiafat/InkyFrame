@@ -8,26 +8,26 @@ from src.models.weather import WeatherCurrent, WeatherForecast
 
 logger = logging.getLogger(__name__)
 
-# Weather icon emoji mapping
+# Weather icon text mapping (using text instead of emoji for better compatibility)
 WEATHER_ICONS = {
-    "01d": "☀️",  # clear sky day
-    "01n": "🌙",  # clear sky night
-    "02d": "⛅",  # few clouds day
-    "02n": "☁️",  # few clouds night
-    "03d": "☁️",  # scattered clouds
-    "03n": "☁️",
-    "04d": "☁️",  # broken clouds
-    "04n": "☁️",
-    "09d": "🌧️",  # shower rain
-    "09n": "🌧️",
-    "10d": "🌦️",  # rain day
-    "10n": "🌧️",  # rain night
-    "11d": "⛈️",  # thunderstorm
-    "11n": "⛈️",
-    "13d": "❄️",  # snow
-    "13n": "❄️",
-    "50d": "🌫️",  # mist
-    "50n": "🌫️",
+    "01d": "CLEAR",      # clear sky day
+    "01n": "CLEAR",      # clear sky night
+    "02d": "PARTLY",     # few clouds day
+    "02n": "CLOUDY",     # few clouds night
+    "03d": "CLOUDY",     # scattered clouds
+    "03n": "CLOUDY",
+    "04d": "CLOUDY",     # broken clouds
+    "04n": "CLOUDY",
+    "09d": "RAIN",       # shower rain
+    "09n": "RAIN",
+    "10d": "RAIN",       # rain day
+    "10n": "RAIN",       # rain night
+    "11d": "STORM",      # thunderstorm
+    "11n": "STORM",
+    "13d": "SNOW",       # snow
+    "13n": "SNOW",
+    "50d": "MIST",       # mist
+    "50n": "MIST",
 }
 
 
@@ -38,10 +38,45 @@ class WeatherRenderer:
         """Initialize weather renderer."""
         self.width = DISPLAY_WIDTH
         self.height = DISPLAY_HEIGHT
+        self._load_fonts()
+    
+    def _load_fonts(self):
+        """Load fonts with fallback to default."""
+        try:
+            # Try to load DejaVu fonts (commonly available on Linux)
+            self.title_font = ImageFont.truetype("/usr/share/fonts/truetype/dejavu/DejaVuSans-Bold.ttf", 36)
+            self.location_font = ImageFont.truetype("/usr/share/fonts/truetype/dejavu/DejaVuSans.ttf", 28)
+            self.temp_font = ImageFont.truetype("/usr/share/fonts/truetype/dejavu/DejaVuSans-Bold.ttf", 60)
+            self.label_font = ImageFont.truetype("/usr/share/fonts/truetype/dejavu/DejaVuSans.ttf", 20)
+            self.forecast_font = ImageFont.truetype("/usr/share/fonts/truetype/dejavu/DejaVuSans.ttf", 18)
+            self.day_font = ImageFont.truetype("/usr/share/fonts/truetype/dejavu/DejaVuSans-Bold.ttf", 16)
+            self.icon_font = ImageFont.truetype("/usr/share/fonts/truetype/dejavu/DejaVuSans-Bold.ttf", 24)
+            logger.info("Loaded DejaVu fonts successfully")
+        except:
+            try:
+                # Fallback to Liberation fonts
+                self.title_font = ImageFont.truetype("/usr/share/fonts/truetype/liberation/LiberationSans-Bold.ttf", 36)
+                self.location_font = ImageFont.truetype("/usr/share/fonts/truetype/liberation/LiberationSans-Regular.ttf", 28)
+                self.temp_font = ImageFont.truetype("/usr/share/fonts/truetype/liberation/LiberationSans-Bold.ttf", 60)
+                self.label_font = ImageFont.truetype("/usr/share/fonts/truetype/liberation/LiberationSans-Regular.ttf", 20)
+                self.forecast_font = ImageFont.truetype("/usr/share/fonts/truetype/liberation/LiberationSans-Regular.ttf", 18)
+                self.day_font = ImageFont.truetype("/usr/share/fonts/truetype/liberation/LiberationSans-Bold.ttf", 16)
+                self.icon_font = ImageFont.truetype("/usr/share/fonts/truetype/liberation/LiberationSans-Bold.ttf", 24)
+                logger.info("Loaded Liberation fonts successfully")
+            except:
+                # Final fallback to default font
+                logger.warning("Could not load TrueType fonts, using default")
+                self.title_font = ImageFont.load_default()
+                self.location_font = ImageFont.load_default()
+                self.temp_font = ImageFont.load_default()
+                self.label_font = ImageFont.load_default()
+                self.forecast_font = ImageFont.load_default()
+                self.day_font = ImageFont.load_default()
+                self.icon_font = ImageFont.load_default()
     
     def _get_weather_icon(self, icon_code: str) -> str:
-        """Get emoji for weather icon code."""
-        return WEATHER_ICONS.get(icon_code, "🌤️")
+        """Get text representation for weather icon code."""
+        return WEATHER_ICONS.get(icon_code, "CLEAR")
     
     def render_weather(
         self,
@@ -64,45 +99,28 @@ class WeatherRenderer:
         img = Image.new('RGB', (self.width, self.height), 'white')
         draw = ImageDraw.Draw(img)
         
-        # Try to use a nice font, fall back to default if not available
-        try:
-            title_font = ImageFont.truetype("arial.ttf", 48)
-            location_font = ImageFont.truetype("arial.ttf", 36)
-            temp_font = ImageFont.truetype("arialbd.ttf", 72)
-            label_font = ImageFont.truetype("arial.ttf", 24)
-            forecast_font = ImageFont.truetype("arial.ttf", 20)
-            day_font = ImageFont.truetype("arialbd.ttf", 18)
-        except:
-            # Fallback to default font
-            title_font = ImageFont.load_default()
-            location_font = ImageFont.load_default()
-            temp_font = ImageFont.load_default()
-            label_font = ImageFont.load_default()
-            forecast_font = ImageFont.load_default()
-            day_font = ImageFont.load_default()
-        
-        y_pos = 20
+        y_pos = 15
         
         # Title
-        draw.text((40, y_pos), "CURRENT WEATHER", font=title_font, fill='black')
-        y_pos += 70
+        draw.text((30, y_pos), "CURRENT WEATHER", font=self.title_font, fill='black')
+        y_pos += 50
         
         # Location
-        draw.text((40, y_pos), current.location, font=location_font, fill='black')
-        y_pos += 60
+        draw.text((30, y_pos), current.location, font=self.location_font, fill='black')
+        y_pos += 45
         
-        # Current temperature (large)
+        # Current temperature and icon
         temp_text = f"{int(current.temperature)}°C"
-        draw.text((40, y_pos), temp_text, font=temp_font, fill='black')
+        draw.text((30, y_pos), temp_text, font=self.temp_font, fill='black')
         
-        # Weather icon (emoji as text)
-        icon = self._get_weather_icon(current.icon)
-        draw.text((250, y_pos), icon, font=temp_font, fill='black')
-        y_pos += 90
+        # Weather icon as text
+        icon_text = self._get_weather_icon(current.icon)
+        draw.text((220, y_pos + 10), icon_text, font=self.icon_font, fill='black')
+        y_pos += 75
         
         # Weather description
-        draw.text((40, y_pos), current.description, font=location_font, fill='black')
-        y_pos += 50
+        draw.text((30, y_pos), current.description, font=self.location_font, fill='black')
+        y_pos += 40
         
         # Details
         details = [
@@ -112,50 +130,50 @@ class WeatherRenderer:
         ]
         
         for detail in details:
-            draw.text((40, y_pos), detail, font=label_font, fill='black')
-            y_pos += 35
+            draw.text((30, y_pos), detail, font=self.label_font, fill='black')
+            y_pos += 28
         
         # Separator line
         y_pos += 10
-        draw.line([(40, y_pos), (self.width - 40, y_pos)], fill='black', width=2)
-        y_pos += 20
+        draw.line([(30, y_pos), (self.width - 30, y_pos)], fill='black', width=2)
+        y_pos += 15
         
         # 5-Day Forecast Title
-        draw.text((40, y_pos), "5-DAY FORECAST", font=title_font, fill='black')
-        y_pos += 60
+        draw.text((30, y_pos), "5-DAY FORECAST", font=self.title_font, fill='black')
+        y_pos += 45
         
         # Forecast cards
-        card_width = (self.width - 120) // 5
-        x_start = 40
+        card_width = (self.width - 80) // 5
+        x_start = 30
         
         for i, day in enumerate(forecast.days[:5]):
             x_pos = x_start + (i * card_width)
             card_y = y_pos
             
             # Day name
-            draw.text((x_pos + 10, card_y), day.day_name, font=day_font, fill='black')
+            draw.text((x_pos + 5, card_y), day.day_name, font=self.day_font, fill='black')
+            card_y += 25
+            
+            # Weather icon as text
+            day_icon = self._get_weather_icon(day.icon)
+            draw.text((x_pos + 5, card_y), day_icon, font=self.forecast_font, fill='black')
             card_y += 30
             
-            # Weather icon
-            day_icon = self._get_weather_icon(day.icon)
-            draw.text((x_pos + 10, card_y), day_icon, font=location_font, fill='black')
-            card_y += 50
-            
             # High temp
-            draw.text((x_pos + 10, card_y), f"{int(day.temp_high)}°", font=forecast_font, fill='black')
-            card_y += 28
+            draw.text((x_pos + 5, card_y), f"H: {int(day.temp_high)}°", font=self.forecast_font, fill='black')
+            card_y += 25
             
             # Low temp
-            draw.text((x_pos + 10, card_y), f"{int(day.temp_low)}°", font=forecast_font, fill='gray')
+            draw.text((x_pos + 5, card_y), f"L: {int(day.temp_low)}°", font=self.forecast_font, fill='gray')
             
             # Vertical separator (except for last card)
             if i < 4:
                 line_x = x_pos + card_width - 5
-                draw.line([(line_x, y_pos), (line_x, y_pos + 130)], fill='lightgray', width=1)
+                draw.line([(line_x, y_pos), (line_x, y_pos + 100)], fill='lightgray', width=1)
         
         # Timestamp at bottom
         timestamp_text = f"Updated: {current.timestamp.strftime('%Y-%m-%d %H:%M')}"
-        draw.text((40, self.height - 40), timestamp_text, font=label_font, fill='gray')
+        draw.text((30, self.height - 30), timestamp_text, font=self.label_font, fill='gray')
         
         # Save image
         output_path = OPTIMIZED_DIR / f"{output_filename}.jpg"
