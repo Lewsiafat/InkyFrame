@@ -10,8 +10,8 @@ from src.config import BASE_DIR, UPLOAD_DIR
 
 # Create FastAPI app
 app = FastAPI(
-    title="Inky Photo Display",
-    description="Web server for uploading and displaying photos on Inky e-ink display",
+    title="InkyFrame",
+    description="Web server for uploading and displaying photos on Inky e-ink displays",
     version="1.0.0"
 )
 

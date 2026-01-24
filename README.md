@@ -1,6 +1,10 @@
-# Inky Photo Display Web Server
+# InkyFrame
 
-A FastAPI-based web application for uploading photos and displaying them on an Inky Impression 7.3" e-ink display.
+> 📸 A FastAPI web server for uploading, optimizing, and displaying photos on Pimoroni Inky Impression e-ink displays
+
+A web-based application that allows users to upload photos via a browser interface, select images from a gallery, and display them on an Inky Impression 7.3" e-ink display. The backend automatically optimizes images for the e-ink display's unique 6-color Spectra palette and resolution.
+
+---
 
 ## Features
 
