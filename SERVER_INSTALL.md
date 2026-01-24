@@ -4,8 +4,8 @@ This guide covers the manual installation steps you need to perform on the devel
 
 ## Prerequisites
 
-- Development board: `lewsiafat@192.168.31.90`
-- Project path: `/home/lewsiafat/Documents/workspaceEink/myInky`
+- Development board: `YOUR_USERNAME@YOUR_SERVER_IP`
+- Project path: `/home/pi/Documents/workspaceEink/myInky`
 - Files already transferred via deployment script
 
 ---
@@ -13,7 +13,7 @@ This guide covers the manual installation steps you need to perform on the devel
 ## Step 1: SSH into the Server
 
 ```bash
-ssh lewsiafat@192.168.31.90
+ssh YOUR_USERNAME@YOUR_SERVER_IP
 ```
 
 ---
@@ -21,7 +21,7 @@ ssh lewsiafat@192.168.31.90
 ## Step 2: Navigate to Project Directory
 
 ```bash
-cd /home/lewsiafat/Documents/workspaceEink/myInky
+cd /home/pi/Documents/workspaceEink/myInky
 ```
 
 ---
@@ -135,13 +135,13 @@ After=network.target
 
 [Service]
 Type=simple
-User=lewsiafat
-WorkingDirectory=/home/lewsiafat/Documents/workspaceEink/myInky
-ExecStart=/home/lewsiafat/.local/bin/uv run uvicorn src.main:app --host 0.0.0.0 --port 8000
+User=YOUR_USERNAME
+WorkingDirectory=/home/pi/Documents/workspaceEink/myInky
+ExecStart=/home/pi/.local/bin/uv run uvicorn src.main:app --host 0.0.0.0 --port 8000
 Restart=always
 RestartSec=10
-StandardOutput=append:/home/lewsiafat/Documents/workspaceEink/myInky/server.log
-StandardError=append:/home/lewsiafat/Documents/workspaceEink/myInky/server.log
+StandardOutput=append:/home/pi/Documents/workspaceEink/myInky/server.log
+StandardError=append:/home/pi/Documents/workspaceEink/myInky/server.log
 
 [Install]
 WantedBy=multi-user.target
@@ -226,7 +226,7 @@ uv run uvicorn src.main:app --host 0.0.0.0 --port 8080
 
 Add your user to the gpio group:
 ```bash
-sudo usermod -a -G gpio lewsiafat
+sudo usermod -a -G gpio YOUR_USERNAME
 ```
 
 Then log out and log back in.

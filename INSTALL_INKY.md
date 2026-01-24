@@ -12,7 +12,7 @@ From your local machine:
 
 ```bash
 # Copy the inky library folder to the server
-scp -r ref_source/inky lewsiafat@192.168.31.90:/home/lewsiafat/Documents/workspaceEink/
+scp -r ref_source/inky YOUR_USERNAME@YOUR_SERVER_IP:/home/pi/Documents/workspaceEink/
 ```
 
 ### Step 2: Install on Server
@@ -20,8 +20,8 @@ scp -r ref_source/inky lewsiafat@192.168.31.90:/home/lewsiafat/Documents/workspa
 SSH into the server and install:
 
 ```bash
-ssh lewsiafat@192.168.31.90
-cd /home/lewsiafat/Documents/workspaceEink/inky
+ssh YOUR_USERNAME@YOUR_SERVER_IP
+cd /home/pi/Documents/workspaceEink/inky
 
 # Install the library with uv
 uv pip install -e .
@@ -36,8 +36,8 @@ This installs the Inky library in editable mode from the local source.
 Alternatively, install the published version from PyPI:
 
 ```bash
-ssh lewsiafat@192.168.31.90
-cd /home/lewsiafat/Documents/workspaceEink/myInky
+ssh YOUR_USERNAME@YOUR_SERVER_IP
+cd /home/pi/Documents/workspaceEink/myInky
 
 # Add inky to your project dependencies
 uv add inky
@@ -96,7 +96,7 @@ sudo raspi-config nonint do_spi 0
 After installing the Inky library, restart your web server:
 
 ```bash
-cd /home/lewsiafat/Documents/workspaceEink/myInky
+cd /home/pi/Documents/workspaceEink/myInky
 pkill -f "uvicorn src.main:app"
 uv run uvicorn src.main:app --host 0.0.0.0 --port 8000
 ```
@@ -112,7 +112,7 @@ The server will now detect the Inky library and use the real display instead of 
 Make sure you installed it in the same virtual environment:
 
 ```bash
-cd /home/lewsiafat/Documents/workspaceEink/myInky
+cd /home/pi/Documents/workspaceEink/myInky
 source .venv/bin/activate  # Activate venv
 pip install -e ../inky     # Install inky library
 ```
@@ -120,7 +120,7 @@ pip install -e ../inky     # Install inky library
 Or with uv:
 
 ```bash
-cd /home/lewsiafat/Documents/workspaceEink/myInky
+cd /home/pi/Documents/workspaceEink/myInky
 uv pip install -e ../inky
 ```
 
@@ -129,9 +129,9 @@ uv pip install -e ../inky
 Add your user to the gpio group:
 
 ```bash
-sudo usermod -a -G gpio lewsiafat
-sudo usermod -a -G spi lewsiafat
-sudo usermod -a -G i2c lewsiafat
+sudo usermod -a -G gpio YOUR_USERNAME
+sudo usermod -a -G spi YOUR_USERNAME
+sudo usermod -a -G i2c YOUR_USERNAME
 ```
 
 Then log out and log back in.
@@ -156,17 +156,17 @@ Here's a complete script to copy and install the Inky library:
 #!/bin/bash
 # Run this on your LOCAL machine
 
-REMOTE_USER="lewsiafat"
+REMOTE_USER="YOUR_USERNAME"
 REMOTE_HOST="192.168.31.90"
 
 # Copy inky library to server
 echo "Copying Inky library to server..."
-scp -r ref_source/inky ${REMOTE_USER}@${REMOTE_HOST}:/home/lewsiafat/Documents/workspaceEink/
+scp -r ref_source/inky ${REMOTE_USER}@${REMOTE_HOST}:/home/pi/Documents/workspaceEink/
 
 # Install on server
 echo "Installing Inky library on server..."
 ssh ${REMOTE_USER}@${REMOTE_HOST} << 'EOF'
-cd /home/lewsiafat/Documents/workspaceEink/myInky
+cd /home/pi/Documents/workspaceEink/myInky
 uv pip install -e ../inky
 echo "Inky library installed!"
 EOF

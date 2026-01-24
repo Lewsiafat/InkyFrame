@@ -2,9 +2,9 @@
 # Install Inky library on remote server
 # Run this script from your local machine
 
-REMOTE_USER="lewsiafat"
+REMOTE_USER="YOUR_USERNAME"
 REMOTE_HOST="192.168.31.90"
-REMOTE_BASE="/home/lewsiafat/Documents/workspaceEink"
+REMOTE_BASE="/home/pi/Documents/workspaceEink"
 
 echo "========================================="
 echo "  Installing Inky Library on Server"

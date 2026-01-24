@@ -66,8 +66,8 @@ chmod +x deploy.sh
 ```
 
 The deployment script will:
-- Check SSH connection to `lewsiafat@192.168.31.90`
-- Sync files to `/home/lewsiafat/Documents/workspaceEink/myInky`
+- Check SSH connection to `YOUR_USERNAME@YOUR_SERVER_IP`
+- Sync files to `/home/pi/Documents/workspaceEink/myInky`
 - Create upload directories
 
 **After deployment, follow the [Server Installation Guide](SERVER_INSTALL.md) to:**
@@ -77,8 +77,8 @@ The deployment script will:
 
 Quick server setup:
 ```bash
-ssh lewsiafat@192.168.31.90
-cd /home/lewsiafat/Documents/workspaceEink/myInky
+ssh YOUR_USERNAME@YOUR_SERVER_IP
+cd /home/pi/Documents/workspaceEink/myInky
 curl -LsSf https://astral.sh/uv/install.sh | sh
 source $HOME/.cargo/env
 uv sync

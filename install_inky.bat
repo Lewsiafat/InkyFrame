@@ -2,9 +2,9 @@
 REM Install Inky library on remote server
 REM Run this script from your local machine
 
-set REMOTE_USER=lewsiafat
+set REMOTE_USER=YOUR_USERNAME
 set REMOTE_HOST=192.168.31.90
-set REMOTE_BASE=/home/lewsiafat/Documents/workspaceEink
+set REMOTE_BASE=/home/pi/Documents/workspaceEink
 
 echo =========================================
 echo   Installing Inky Library on Server

@@ -3,9 +3,9 @@
 # Deploys to development board via SSH
 
 # Configuration
-REMOTE_USER="lewsiafat"
+REMOTE_USER="YOUR_USERNAME"
 REMOTE_HOST="192.168.31.90"
-REMOTE_PATH="/home/lewsiafat/Documents/workspaceEink/myInky"
+REMOTE_PATH="/home/pi/Documents/workspaceEink/myInky"
 LOCAL_PATH="."
 
 # Colors for output
