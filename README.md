@@ -45,6 +45,11 @@ http://localhost:8000
 
 ### Quick Deploy to Development Board
 
+**Windows (Batch Script):**
+```cmd
+deploy.bat
+```
+
 **Windows (PowerShell):**
 ```powershell
 .\deploy.ps1

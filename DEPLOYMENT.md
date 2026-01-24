@@ -2,6 +2,11 @@
 
 ## Quick Deploy
 
+### Windows (Batch Script)
+```cmd
+deploy.bat
+```
+
 ### Windows (PowerShell)
 ```powershell
 .\deploy.ps1
