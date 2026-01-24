@@ -99,13 +99,9 @@ class WeatherRenderer:
         img = Image.new('RGB', (self.width, self.height), 'white')
         draw = ImageDraw.Draw(img)
         
-        y_pos = 15
+        y_pos = 20
         
-        # Title
-        draw.text((30, y_pos), "CURRENT WEATHER", font=self.title_font, fill='black')
-        y_pos += 50
-        
-        # Location
+        # Location (no title, start with location)
         draw.text((30, y_pos), current.location, font=self.location_font, fill='black')
         y_pos += 45
         
@@ -171,9 +167,14 @@ class WeatherRenderer:
                 line_x = x_pos + card_width - 5
                 draw.line([(line_x, y_pos), (line_x, y_pos + 100)], fill='lightgray', width=1)
         
-        # Timestamp at bottom - use simpler format to avoid issues
-        timestamp_text = current.timestamp.strftime('%Y-%m-%d %H:%M')
-        draw.text((30, self.height - 35), f"Updated: {timestamp_text}", font=self.label_font, fill='gray')
+        # Timestamp at bottom - use ASCII only to avoid encoding issues
+        year = current.timestamp.year
+        month = current.timestamp.month
+        day = current.timestamp.day
+        hour = current.timestamp.hour
+        minute = current.timestamp.minute
+        timestamp_text = f"Updated: {year}-{month:02d}-{day:02d} {hour:02d}:{minute:02d}"
+        draw.text((30, self.height - 40), timestamp_text, font=self.label_font, fill='gray')
         
         # Save image
         output_path = OPTIMIZED_DIR / f"{output_filename}.jpg"
