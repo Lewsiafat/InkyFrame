@@ -64,12 +64,21 @@ chmod +x deploy.sh
 The deployment script will:
 - Check SSH connection to `lewsiafat@192.168.31.90`
 - Sync files to `/home/lewsiafat/Documents/workspaceEink/myInky`
-- Install dependencies on the remote server
-- Set up upload directories
+- Create upload directories
 
-After deployment, start the server:
+**After deployment, follow the [Server Installation Guide](SERVER_INSTALL.md) to:**
+1. Install `uv` on the server (if not already installed)
+2. Install Python dependencies
+3. Start the server
+
+Quick server setup:
 ```bash
-ssh lewsiafat@192.168.31.90 'cd /home/lewsiafat/Documents/workspaceEink/myInky && uv run uvicorn src.main:app --host 0.0.0.0 --port 8000'
+ssh lewsiafat@192.168.31.90
+cd /home/lewsiafat/Documents/workspaceEink/myInky
+curl -LsSf https://astral.sh/uv/install.sh | sh
+source $HOME/.cargo/env
+uv sync
+uv run uvicorn src.main:app --host 0.0.0.0 --port 8000
 ```
 
 Access at: **http://192.168.31.90:8000**
