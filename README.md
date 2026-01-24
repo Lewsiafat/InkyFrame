@@ -41,6 +41,37 @@ uv run uvicorn src.main:app --reload --host 0.0.0.0 --port 8000
 http://localhost:8000
 ```
 
+## Deployment
+
+### Quick Deploy to Development Board
+
+**Windows (PowerShell):**
+```powershell
+.\deploy.ps1
+```
+
+**Linux/Mac (Bash):**
+```bash
+chmod +x deploy.sh
+./deploy.sh
+```
+
+The deployment script will:
+- Check SSH connection to `lewsiafat@192.168.31.90`
+- Sync files to `/home/lewsiafat/Documents/workspaceEink/myInky`
+- Install dependencies on the remote server
+- Set up upload directories
+
+After deployment, start the server:
+```bash
+ssh lewsiafat@192.168.31.90 'cd /home/lewsiafat/Documents/workspaceEink/myInky && uv run uvicorn src.main:app --host 0.0.0.0 --port 8000'
+```
+
+Access at: **http://192.168.31.90:8000**
+
+For detailed deployment instructions, see [DEPLOYMENT.md](DEPLOYMENT.md).
+
+
 ## Usage
 
 1. **Upload Photos**: Drag and drop photos onto the upload area or click to browse
