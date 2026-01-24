@@ -160,7 +160,7 @@ class WeatherRenderer:
             card_y += 25
             
             # Low temp - use darker color for better visibility
-            draw.text((x_pos + 5, card_y), f"L: {int(day.temp_low)}°", font=self.forecast_font, fill='#666666')
+            draw.text((x_pos + 5, card_y), f"L: {int(day.temp_low)}°", font=self.forecast_font, fill='#333333')
             
             # Vertical separator (except for last card)
             if i < 4:

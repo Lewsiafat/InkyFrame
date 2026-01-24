@@ -5,9 +5,9 @@ REM Deploys to development board via SSH using rsync
 setlocal enabledelayedexpansion
 
 REM Configuration
-set REMOTE_USER=YOUR_USERNAME
+set REMOTE_USER=lewsiafat
 set REMOTE_HOST=192.168.31.90
-set REMOTE_PATH=/home/pi/Documents/workspaceEink/myInky
+set REMOTE_PATH=/home/lewsiafat/Documents/workspaceEink/myInky
 set LOCAL_PATH=.
 
 echo ========================================
