@@ -159,22 +159,27 @@ class WeatherRenderer:
             draw.text((x_pos + 5, card_y), f"H: {int(day.temp_high)}°", font=self.forecast_font, fill='black')
             card_y += 25
             
-            # Low temp
-            draw.text((x_pos + 5, card_y), f"L: {int(day.temp_low)}°", font=self.forecast_font, fill='gray')
+            # Low temp - use darker color for better visibility
+            draw.text((x_pos + 5, card_y), f"L: {int(day.temp_low)}°", font=self.forecast_font, fill='#666666')
             
             # Vertical separator (except for last card)
             if i < 4:
                 line_x = x_pos + card_width - 5
                 draw.line([(line_x, y_pos), (line_x, y_pos + 100)], fill='lightgray', width=1)
         
-        # Timestamp at bottom - use ASCII only to avoid encoding issues
+        # Timestamp at bottom right - use ASCII only to avoid encoding issues
         year = current.timestamp.year
         month = current.timestamp.month
         day = current.timestamp.day
         hour = current.timestamp.hour
         minute = current.timestamp.minute
         timestamp_text = f"Updated: {year}-{month:02d}-{day:02d} {hour:02d}:{minute:02d}"
-        draw.text((30, self.height - 40), timestamp_text, font=self.label_font, fill='gray')
+        
+        # Calculate text width to right-align
+        # Approximate width calculation (each char ~10px for size 20 font)
+        text_width = len(timestamp_text) * 10
+        x_position = self.width - text_width - 30
+        draw.text((x_position, self.height - 40), timestamp_text, font=self.label_font, fill='gray')
         
         # Save image
         output_path = OPTIMIZED_DIR / f"{output_filename}.jpg"
