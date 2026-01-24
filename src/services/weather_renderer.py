@@ -171,9 +171,9 @@ class WeatherRenderer:
                 line_x = x_pos + card_width - 5
                 draw.line([(line_x, y_pos), (line_x, y_pos + 100)], fill='lightgray', width=1)
         
-        # Timestamp at bottom
-        timestamp_text = f"Updated: {current.timestamp.strftime('%Y-%m-%d %H:%M')}"
-        draw.text((30, self.height - 30), timestamp_text, font=self.label_font, fill='gray')
+        # Timestamp at bottom - use simpler format to avoid issues
+        timestamp_text = current.timestamp.strftime('%Y-%m-%d %H:%M')
+        draw.text((30, self.height - 35), f"Updated: {timestamp_text}", font=self.label_font, fill='gray')
         
         # Save image
         output_path = OPTIMIZED_DIR / f"{output_filename}.jpg"
