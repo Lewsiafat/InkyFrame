@@ -5,7 +5,7 @@ from fastapi.middleware.cors import CORSMiddleware
 from fastapi.responses import FileResponse
 from pathlib import Path
 
-from src.api import upload, gallery, display
+from src.api import upload, gallery, display, weather
 from src.config import BASE_DIR, UPLOAD_DIR
 
 # Create FastAPI app
@@ -28,6 +28,7 @@ app.add_middleware(
 app.include_router(upload.router)
 app.include_router(gallery.router)
 app.include_router(display.router)
+app.include_router(weather.router)
 
 # Mount static files
 app.mount("/static", StaticFiles(directory=str(BASE_DIR / "static")), name="static")
