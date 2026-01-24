@@ -297,3 +297,131 @@ function formatDate(timestamp) {
     if (diff < 86400000) return Math.floor(diff / 3600000) + 'h ago';
     return date.toLocaleDateString();
 }
+
+// Weather icon mapping
+const weatherIcons = {
+    "01d": "☀️", "01n": "🌙",
+    "02d": "⛅", "02n": "☁️",
+    "03d": "☁️", "03n": "☁️",
+    "04d": "☁️", "04n": "☁️",
+    "09d": "🌧️", "09n": "🌧️",
+    "10d": "🌦️", "10n": "🌧️",
+    "11d": "⛈️", "11n": "⛈️",
+    "13d": "❄️", "13n": "❄️",
+    "50d": "🌫️", "50n": "🌫️"
+};
+
+// Tab Navigation
+document.querySelectorAll('.nav-tab').forEach(tab => {
+    tab.addEventListener('click', () => {
+        const targetTab = tab.dataset.tab;
+
+        // Update active tab
+        document.querySelectorAll('.nav-tab').forEach(t => t.classList.remove('active'));
+        tab.classList.add('active');
+
+        // Show/hide sections
+        if (targetTab === 'photos') {
+            document.querySelector('.upload-section').classList.remove('hidden');
+            document.querySelector('.gallery-section').classList.remove('hidden');
+            document.querySelector('.weather-section').classList.add('hidden');
+        } else if (targetTab === 'weather') {
+            document.querySelector('.upload-section').classList.add('hidden');
+            document.querySelector('.gallery-section').classList.add('hidden');
+            document.querySelector('.weather-section').classList.remove('hidden');
+            loadWeather();
+        }
+    });
+});
+
+// Load Weather Data
+async function loadWeather() {
+    const weatherContent = document.getElementById('weather-content');
+    const weatherDisplay = document.getElementById('weather-display');
+
+    try {
+        // Show loading
+        weatherContent.classList.remove('hidden');
+        weatherDisplay.classList.add('hidden');
+
+        // Fetch current weather and forecast
+        const [currentResponse, forecastResponse] = await Promise.all([
+            fetch('/api/weather/current'),
+            fetch('/api/weather/forecast')
+        ]);
+
+        if (!currentResponse.ok || !forecastResponse.ok) {
+            throw new Error('Failed to fetch weather data');
+        }
+
+        const current = await currentResponse.json();
+        const forecast = await forecastResponse.json();
+
+        // Update UI
+        displayWeatherData(current, forecast);
+
+        // Hide loading, show weather
+        weatherContent.classList.add('hidden');
+        weatherDisplay.classList.remove('hidden');
+
+    } catch (error) {
+        console.error('Weather load error:', error);
+        weatherContent.innerHTML = '<div class="weather-loading">Failed to load weather data. Please check API key configuration.</div>';
+    }
+}
+
+// Display Weather Data
+function displayWeatherData(current, forecast) {
+    // Current weather
+    document.getElementById('weather-location').textContent = current.location;
+    document.getElementById('weather-temp').textContent = `${Math.round(current.temperature)}°`;
+    document.getElementById('weather-icon').textContent = weatherIcons[current.icon] || '🌤️';
+    document.getElementById('weather-description').textContent = current.description;
+    document.getElementById('weather-feels').textContent = `${Math.round(current.feels_like)}°`;
+    document.getElementById('weather-humidity').textContent = `${current.humidity}%`;
+    document.getElementById('weather-wind').textContent = `${current.wind_speed} m/s`;
+
+    // Forecast cards
+    const forecastCards = document.getElementById('forecast-cards');
+    forecastCards.innerHTML = forecast.days.map(day => `
+        <div class="forecast-card">
+            <div class="day-name">${day.day_name}</div>
+            <div class="forecast-icon">${weatherIcons[day.icon] || '🌤️'}</div>
+            <div class="temp-high">${Math.round(day.temp_high)}°</div>
+            <div class="temp-low">${Math.round(day.temp_low)}°</div>
+        </div>
+    `).join('');
+}
+
+// Display Weather on Inky
+document.getElementById('display-weather-btn').addEventListener('click', async () => {
+    const btn = document.getElementById('display-weather-btn');
+    btn.disabled = true;
+    btn.textContent = 'Sending to display...';
+
+    try {
+        const response = await fetch('/api/weather/display', {
+            method: 'POST',
+            headers: {
+                'Content-Type': 'application/json'
+            },
+            body: JSON.stringify({})
+        });
+
+        if (!response.ok) {
+            const error = await response.json();
+            throw new Error(error.detail || 'Display failed');
+        }
+
+        const data = await response.json();
+        showToast(`Weather display updating... (~${data.estimated_time}s)`, 'success');
+
+    } catch (error) {
+        console.error('Display error:', error);
+        showToast(error.message, 'error');
+    } finally {
+        btn.disabled = false;
+        btn.textContent = 'Display Weather on Inky';
+    }
+});
+

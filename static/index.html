@@ -13,6 +13,13 @@
         <header>
             <h1>📷 InkyFrame</h1>
             <p>Upload photos and display them on your e-ink screen</p>
+
+            <!-- Navigation Tabs -->
+            <div class="nav-tabs">
+                <button class="nav-tab active" data-tab="photos">📸 Photos</button>
+                <button class="nav-tab" data-tab="weather">🌤️ Weather</button>
+            </div>
+
             <div id="status-indicator" class="status-idle">
                 <span class="status-dot"></span>
                 <span id="status-text">Display: Idle</span>
@@ -38,6 +45,43 @@
                         <div id="progress-fill" class="progress-fill"></div>
                     </div>
                     <p id="progress-text">Uploading...</p>
+                </div>
+            </div>
+        </section>
+
+        <!-- Weather Section -->
+        <section class="weather-section hidden">
+            <div class="section-header">
+                <h2>Weather Display</h2>
+                <button id="display-weather-btn" class="btn btn-primary">Display Weather on Inky</button>
+            </div>
+
+            <div id="weather-content" class="weather-content">
+                <div class="weather-loading">Loading weather data...</div>
+            </div>
+
+            <div id="weather-display" class="weather-display hidden">
+                <div class="current-weather">
+                    <h3 id="weather-location">-</h3>
+                    <div class="weather-main">
+                        <div class="weather-temp">
+                            <span id="weather-temp" class="temp-large">--°</span>
+                            <span id="weather-icon" class="weather-icon-large">🌤️</span>
+                        </div>
+                        <div class="weather-details">
+                            <p id="weather-description">-</p>
+                            <p>Feels like: <span id="weather-feels">--°</span></p>
+                            <p>Humidity: <span id="weather-humidity">--%</span></p>
+                            <p>Wind: <span id="weather-wind">-- m/s</span></p>
+                        </div>
+                    </div>
+                </div>
+
+                <div class="forecast-section">
+                    <h3>5-Day Forecast</h3>
+                    <div id="forecast-cards" class="forecast-cards">
+                        <!-- Forecast cards will be inserted here -->
+                    </div>
                 </div>
             </div>
         </section>

@@ -105,17 +105,22 @@ async def display_weather(
         )
     
     try:
+        # Import weather renderer
+        from src.services.weather_renderer import weather_renderer
+        
         # Fetch weather data
         current = await weather_service.get_current_weather(request.location)
         forecast = await weather_service.get_forecast(request.location)
         
-        # TODO: Render weather image and display
-        # For now, just return success
-        # background_tasks.add_task(
-        #     display_controller.display_weather,
-        #     current,
-        #     forecast
-        # )
+        # Render weather image
+        image_path = weather_renderer.render_weather(current, forecast)
+        
+        # Display on Inky in background
+        background_tasks.add_task(
+            display_controller.display_photo,
+            image_path,
+            "weather_display"
+        )
         
         return DisplayResponse(
             status=DisplayStatus.UPDATING,

@@ -22,7 +22,7 @@ DEFAULT_SATURATION = 0.5
 
 # Weather settings
 OPENWEATHER_API_KEY = os.getenv("OPENWEATHER_API_KEY", "")
-WEATHER_LOCATION = os.getenv("WEATHER_LOCATION", "Hong Kong")
+WEATHER_LOCATION = os.getenv("WEATHER_LOCATION", "Taipei,TW")
 WEATHER_UNITS = os.getenv("WEATHER_UNITS", "metric")  # metric or imperial
 WEATHER_CACHE_MINUTES = int(os.getenv("WEATHER_CACHE_MINUTES", "30"))
 
