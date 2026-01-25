@@ -1,6 +1,10 @@
 """Configuration settings for the Inky Photo Display application."""
 import os
 from pathlib import Path
+from dotenv import load_dotenv
+
+# Load environment variables from .env file
+load_dotenv()
 
 # Base directory
 BASE_DIR = Path(__file__).parent.parent
