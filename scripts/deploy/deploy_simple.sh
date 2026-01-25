@@ -23,7 +23,7 @@ scp pyproject.toml ${REMOTE_USER}@${REMOTE_HOST}:${REMOTE_PATH}/
 
 # Upload server management scripts
 echo "[4/5] Uploading server scripts..."
-scp start.sh stop.sh restart.sh status.sh ${REMOTE_USER}@${REMOTE_HOST}:${REMOTE_PATH}/
+scp scripts/server/start.sh scripts/server/stop.sh scripts/server/restart.sh scripts/server/status.sh ${REMOTE_USER}@${REMOTE_HOST}:${REMOTE_PATH}/scripts/server/
 
 # Upload .env if exists
 echo "[5/5] Uploading .env (if exists)..."
@@ -42,6 +42,6 @@ echo ""
 echo "Next: SSH into server and restart:"
 echo "  ssh ${REMOTE_USER}@${REMOTE_HOST}"
 echo "  cd ${REMOTE_PATH}"
-echo "  chmod +x *.sh"
-echo "  ./restart.sh"
+echo "  chmod +x scripts/server/*.sh"
+echo "  scripts/server/restart.sh"
 echo ""

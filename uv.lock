@@ -181,6 +181,7 @@ dependencies = [
     { name = "pillow" },
     { name = "pydantic" },
     { name = "python-dateutil" },
+    { name = "python-dotenv" },
     { name = "python-multipart" },
     { name = "uvicorn", extra = ["standard"] },
 ]
@@ -194,6 +195,7 @@ requires-dist = [
     { name = "pillow", specifier = ">=10.2.0" },
     { name = "pydantic", specifier = ">=2.5.0" },
     { name = "python-dateutil", specifier = ">=2.8.2" },
+    { name = "python-dotenv", specifier = ">=1.0.0" },
     { name = "python-multipart", specifier = ">=0.0.9" },
     { name = "uvicorn", extras = ["standard"], specifier = ">=0.27.0" },
 ]

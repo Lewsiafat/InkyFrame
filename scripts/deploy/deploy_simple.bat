@@ -2,9 +2,9 @@
 REM Simple deployment script - just upload code to server
 
 REM Configuration - UPDATE THESE VALUES
-set REMOTE_USER=YOUR_USERNAME
-set REMOTE_HOST=YOUR_SERVER_IP
-set REMOTE_PATH=/path/to/InkyFrame
+set REMOTE_USER=lewsiafat
+set REMOTE_HOST=192.168.31.90
+set REMOTE_PATH=/home/lewsiafat/Documents/workspaceEink/myInky
 
 echo Uploading code to server...
 echo.
@@ -23,7 +23,7 @@ scp pyproject.toml %REMOTE_USER%@%REMOTE_HOST%:%REMOTE_PATH%/
 
 REM Upload server management scripts
 echo [4/5] Uploading server scripts...
-scp start.sh stop.sh restart.sh status.sh %REMOTE_USER%@%REMOTE_HOST%:%REMOTE_PATH%/
+scp scripts/server/start.sh scripts/server/stop.sh scripts/server/restart.sh scripts/server/status.sh %REMOTE_USER%@%REMOTE_HOST%:%REMOTE_PATH%/scripts/server/
 
 REM Upload .env if exists
 echo [5/5] Uploading .env (if exists)...
@@ -42,7 +42,7 @@ echo.
 echo Next: SSH into server and restart:
 echo   ssh %REMOTE_USER%@%REMOTE_HOST%
 echo   cd %REMOTE_PATH%
-echo   chmod +x *.sh
-echo   ./restart.sh
+echo   chmod +x scripts/server/*.sh
+echo   scripts/server/restart.sh
 echo.
 pause

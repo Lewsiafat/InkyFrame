@@ -73,8 +73,15 @@ http://localhost:8000
 
 Use the simple deployment script to upload code to your server:
 
+**Windows:**
 ```cmd
-deploy_simple.bat
+scripts\deploy\deploy_simple.bat
+```
+
+**Linux/Mac:**
+```bash
+chmod +x scripts/deploy/deploy_simple.sh
+scripts/deploy/deploy_simple.sh
 ```
 
 Then SSH into your server and restart:
@@ -82,14 +89,15 @@ Then SSH into your server and restart:
 ```bash
 ssh YOUR_USERNAME@YOUR_SERVER_IP
 cd /path/to/InkyFrame
-pkill -f uvicorn
-uv run uvicorn src.main:app --host 0.0.0.0 --port 8000
+chmod +x scripts/server/*.sh
+scripts/server/restart.sh
 ```
 
 **For detailed deployment instructions, see:**
-- [SERVER_INSTALL.md](SERVER_INSTALL.md) - Server setup guide
-- [DEPLOYMENT.md](DEPLOYMENT.md) - Full deployment documentation
-- [INSTALL_INKY.md](INSTALL_INKY.md) - Inky library installation
+- [SERVER_INSTALL.md](docs/SERVER_INSTALL.md) - Server setup guide
+- [DEPLOYMENT.md](docs/DEPLOYMENT.md) - Full deployment documentation
+- [INSTALL_INKY.md](docs/INSTALL_INKY.md) - Inky library installation
+- [DEPLOY_SCRIPTS.md](docs/DEPLOY_SCRIPTS.md) - Deployment scripts guide
 
 ## Usage
 
@@ -110,37 +118,63 @@ uv run uvicorn src.main:app --host 0.0.0.0 --port 8000
 
 ```
 InkyFrame/
-├── src/
-│   ├── api/              # API endpoints
-│   │   ├── upload.py     # Photo upload
-│   │   ├── gallery.py    # Gallery management
-│   │   ├── display.py    # Display control
-│   │   └── weather.py    # Weather endpoints
-│   ├── services/         # Business logic
-│   │   ├── storage.py    # File storage
+├── src/                      # Source code
+│   ├── api/                  # API endpoints
+│   │   ├── upload.py         # Photo upload
+│   │   ├── gallery.py        # Gallery management
+│   │   ├── display.py        # Display control
+│   │   └── weather.py        # Weather endpoints
+│   ├── services/             # Business logic
+│   │   ├── storage.py        # File storage
 │   │   ├── image_processor.py      # Image optimization
 │   │   ├── display_controller.py   # Inky display control
 │   │   ├── weather_service.py      # OpenWeatherMap API
 │   │   └── weather_renderer.py     # Weather image generation
-│   ├── models/           # Data models
-│   │   ├── photo.py      # Photo models
-│   │   └── weather.py    # Weather models
-│   ├── config.py         # Configuration
-│   └── main.py           # FastAPI application
-├── static/               # Frontend files
+│   ├── models/               # Data models
+│   │   ├── photo.py          # Photo models
+│   │   └── weather.py        # Weather models
+│   ├── config.py             # Configuration
+│   └── main.py               # FastAPI application
+├── static/                   # Frontend files
 │   ├── css/
-│   │   └── style.css     # Styles
+│   │   └── style.css         # Styles
 │   ├── js/
-│   │   └── app.js        # Frontend logic
-│   └── index.html        # Main page
-├── uploads/              # Uploaded files (auto-created)
-│   ├── originals/        # Original uploads
-│   ├── optimized/        # Inky-optimized versions
-│   └── thumbnails/       # Gallery thumbnails
-├── spec/                 # Documentation
-│   └── project_spec.md   # Project specification
-├── deploy_simple.bat     # Simple deployment script
-└── pyproject.toml        # Dependencies
+│   │   └── app.js            # Frontend logic
+│   └── index.html            # Main page
+├── scripts/                  # Deployment & management scripts
+│   ├── deploy/               # Deployment scripts
+│   │   ├── deploy.bat        # Windows full deploy
+│   │   ├── deploy.ps1        # PowerShell deploy
+│   │   ├── deploy.sh         # Bash full deploy
+│   │   ├── deploy_simple.bat # Windows simple deploy
+│   │   └── deploy_simple.sh  # Bash simple deploy
+│   ├── server/               # Server management
+│   │   ├── start.sh          # Start server
+│   │   ├── stop.sh           # Stop server
+│   │   ├── restart.sh        # Restart server
+│   │   └── status.sh         # Check status
+│   └── install/              # Installation scripts
+│       ├── install_inky.bat  # Windows Inky install
+│       └── install_inky.sh   # Bash Inky install
+├── docs/                     # Documentation
+│   ├── DEPLOYMENT.md         # Deployment guide
+│   ├── SERVER_INSTALL.md     # Server setup
+│   ├── INSTALL_INKY.md       # Inky library install
+│   ├── WEATHER_TESTING.md    # Weather testing
+│   ├── GITHUB.md             # GitHub guide
+│   ├── DEPLOY_SCRIPTS.md     # Scripts documentation
+│   ├── project_spec.md       # Project specification
+│   └── api/                  # API documentation
+│       ├── inky_api_spec.md  # Inky API spec
+│       └── hardware_spec.md  # Hardware spec
+├── uploads/                  # Uploaded files (auto-created)
+│   ├── originals/            # Original uploads
+│   ├── optimized/            # Inky-optimized versions
+│   └── thumbnails/           # Gallery thumbnails
+├── .env                      # Environment variables (gitignored)
+├── .env.example              # Environment template
+├── pyproject.toml            # Dependencies
+└── README.md                 # This file
 ```
 
 ## API Endpoints
