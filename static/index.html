@@ -18,6 +18,7 @@
             <div class="nav-tabs">
                 <button class="nav-tab active" data-tab="photos">📸 Photos</button>
                 <button class="nav-tab" data-tab="weather">🌤️ Weather</button>
+                <button class="nav-tab" data-tab="rotation">🔄 Rotation</button>
             </div>
 
             <div id="status-indicator" class="status-idle">
@@ -81,6 +82,88 @@
                     <h3>5-Day Forecast</h3>
                     <div id="forecast-cards" class="forecast-cards">
                         <!-- Forecast cards will be inserted here -->
+                    </div>
+                </div>
+            </div>
+        </section>
+
+        <!-- Rotation Section -->
+        <section class="rotation-section hidden">
+            <div class="section-header">
+                <h2>Rotation Schedule</h2>
+                <div class="rotation-controls">
+                    <button id="start-rotation-btn" class="btn btn-primary">▶️ Start Rotation</button>
+                    <button id="stop-rotation-btn" class="btn btn-secondary" disabled>⏹️ Stop</button>
+                    <button id="skip-next-btn" class="btn btn-secondary" disabled>⏭️ Skip to Next</button>
+                </div>
+            </div>
+
+            <!-- Interval Configuration -->
+            <div class="rotation-config">
+                <div class="config-group">
+                    <label for="rotation-interval">Rotation Interval:</label>
+                    <select id="rotation-interval" class="interval-select">
+                        <option value="5">5 minutes</option>
+                        <option value="15">15 minutes</option>
+                        <option value="30" selected>30 minutes</option>
+                        <option value="60">1 hour</option>
+                        <option value="120">2 hours</option>
+                        <option value="360">6 hours</option>
+                        <option value="720">12 hours</option>
+                    </select>
+                </div>
+            </div>
+
+            <!-- Playlist Builder -->
+            <div class="playlist-builder">
+                <h3>Build Rotation Playlist</h3>
+
+                <!-- Photo Selection -->
+                <div class="photo-selector">
+                    <h4>Select Photos:</h4>
+                    <div id="photo-checkboxes" class="photo-checkboxes">
+                        <div class="empty-state">
+                            <p>No photos available. Upload photos first!</p>
+                        </div>
+                    </div>
+                </div>
+
+                <!-- Weather Toggle -->
+                <div class="weather-toggle">
+                    <label class="checkbox-label">
+                        <input type="checkbox" id="include-weather">
+                        <span>Include Weather Display</span>
+                    </label>
+                </div>
+
+                <!-- Playlist Preview -->
+                <div class="playlist-preview">
+                    <h4>Rotation Order:</h4>
+                    <ol id="playlist-items" class="playlist-items">
+                        <li class="empty-state">Build your playlist above</li>
+                    </ol>
+                </div>
+            </div>
+
+            <!-- Status Display -->
+            <div class="rotation-status">
+                <h3>Rotation Status</h3>
+                <div class="status-grid">
+                    <div class="status-item">
+                        <span class="status-label">State:</span>
+                        <span id="rotation-state" class="status-value">Stopped</span>
+                    </div>
+                    <div class="status-item">
+                        <span class="status-label">Current Item:</span>
+                        <span id="current-item" class="status-value">-</span>
+                    </div>
+                    <div class="status-item">
+                        <span class="status-label">Next Update:</span>
+                        <span id="next-update" class="status-value">-</span>
+                    </div>
+                    <div class="status-item">
+                        <span class="status-label">Playlist Size:</span>
+                        <span id="playlist-size" class="status-value">0 items</span>
                     </div>
                 </div>
             </div>

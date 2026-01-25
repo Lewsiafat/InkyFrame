@@ -5,8 +5,9 @@ from fastapi.middleware.cors import CORSMiddleware
 from fastapi.responses import FileResponse
 from pathlib import Path
 
-from src.api import upload, gallery, display, weather
+from src.api import upload, gallery, display, weather, rotation
 from src.config import BASE_DIR, UPLOAD_DIR
+from src.services.rotation_scheduler import rotation_scheduler
 
 # Create FastAPI app
 app = FastAPI(
@@ -29,10 +30,18 @@ app.include_router(upload.router)
 app.include_router(gallery.router)
 app.include_router(display.router)
 app.include_router(weather.router)
+app.include_router(rotation.router)
 
 # Mount static files
 app.mount("/static", StaticFiles(directory=str(BASE_DIR / "static")), name="static")
 app.mount("/uploads", StaticFiles(directory=str(UPLOAD_DIR)), name="uploads")
+
+
+@app.on_event("startup")
+async def startup_event():
+    """Initialize services on startup."""
+    # Restore rotation state if it was active
+    await rotation_scheduler.restore_state()
 
 
 @app.get("/")
