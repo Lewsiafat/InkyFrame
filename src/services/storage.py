@@ -138,3 +138,7 @@ class StorageService:
                 photo_id = file_path.stem
                 photos.append((photo_id, file_path))
         return photos
+
+
+# Global storage service instance
+storage_service = StorageService()
