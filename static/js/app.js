@@ -325,11 +325,19 @@ document.querySelectorAll('.nav-tab').forEach(tab => {
             document.querySelector('.upload-section').classList.remove('hidden');
             document.querySelector('.gallery-section').classList.remove('hidden');
             document.querySelector('.weather-section').classList.add('hidden');
+            document.querySelector('.rotation-section').classList.add('hidden');
         } else if (targetTab === 'weather') {
             document.querySelector('.upload-section').classList.add('hidden');
             document.querySelector('.gallery-section').classList.add('hidden');
             document.querySelector('.weather-section').classList.remove('hidden');
+            document.querySelector('.rotation-section').classList.add('hidden');
             loadWeather();
+        } else if (targetTab === 'rotation') {
+            document.querySelector('.upload-section').classList.add('hidden');
+            document.querySelector('.gallery-section').classList.add('hidden');
+            document.querySelector('.weather-section').classList.add('hidden');
+            document.querySelector('.rotation-section').classList.remove('hidden');
+            loadRotation();
         }
     });
 });
@@ -423,5 +431,237 @@ document.getElementById('display-weather-btn').addEventListener('click', async (
         btn.disabled = false;
         btn.textContent = 'Display Weather on Inky';
     }
+});
+
+// Rotation Management
+let rotationStatusInterval = null;
+
+// Load Rotation Data
+async function loadRotation() {
+    try {
+        // Load photos for playlist builder
+        await loadPhotos();
+        updatePhotoCheckboxes();
+
+        // Load current rotation status
+        await updateRotationStatus();
+
+        // Start polling for status updates
+        if (rotationStatusInterval) {
+            clearInterval(rotationStatusInterval);
+        }
+        rotationStatusInterval = setInterval(updateRotationStatus, 5000);
+
+    } catch (error) {
+        console.error('Failed to load rotation:', error);
+        showToast('Failed to load rotation data', 'error');
+    }
+}
+
+// Update Photo Checkboxes
+function updatePhotoCheckboxes() {
+    const container = document.getElementById('photo-checkboxes');
+
+    if (photos.length === 0) {
+        container.innerHTML = '<div class="empty-state"><p>No photos available. Upload photos first!</p></div>';
+        return;
+    }
+
+    container.innerHTML = photos.map(photo => `
+        <label class="photo-checkbox-item">
+            <input type="checkbox" class="photo-checkbox" value="${photo.id}">
+            <img src="${photo.thumbnail_url}" alt="${photo.filename}">
+            <span>${photo.filename}</span>
+        </label>
+    `).join('');
+
+    // Add change listeners
+    document.querySelectorAll('.photo-checkbox').forEach(checkbox => {
+        checkbox.addEventListener('change', updatePlaylistPreview);
+    });
+
+    // Weather checkbox listener
+    document.getElementById('include-weather').addEventListener('change', updatePlaylistPreview);
+}
+
+// Update Playlist Preview
+function updatePlaylistPreview() {
+    const selectedPhotos = Array.from(document.querySelectorAll('.photo-checkbox:checked'))
+        .map(cb => photos.find(p => p.id === cb.value));
+    const includeWeather = document.getElementById('include-weather').checked;
+
+    const playlistItems = document.getElementById('playlist-items');
+    const items = [];
+
+    selectedPhotos.forEach(photo => {
+        items.push(`<li>📸 ${photo.filename}</li>`);
+    });
+
+    if (includeWeather) {
+        items.push(`<li>🌤️ Weather Display</li>`);
+    }
+
+    if (items.length === 0) {
+        playlistItems.innerHTML = '<li class="empty-state">Build your playlist above</li>';
+    } else {
+        playlistItems.innerHTML = items.join('');
+    }
+}
+
+// Update Rotation Status
+async function updateRotationStatus() {
+    try {
+        const response = await fetch('/api/rotation/status');
+        const data = await response.json();
+
+        // Update status display
+        document.getElementById('rotation-state').textContent = data.enabled ? 'Running' : 'Stopped';
+
+        // Format current item display
+        let currentItemText = '-';
+        if (data.current_item) {
+            if (data.current_item.type === 'weather') {
+                currentItemText = '🌤️ Weather';
+            } else if (data.current_item.type === 'photo') {
+                // Find the photo filename
+                const photo = photos.find(p => p.id === data.current_item.photo_id);
+                currentItemText = photo ? `📸 ${photo.filename}` : `📸 Photo ${data.current_item.photo_id}`;
+            }
+        }
+        document.getElementById('current-item').textContent = currentItemText;
+
+        // Format next update time
+        if (data.next_update) {
+            const nextTime = new Date(data.next_update);
+            document.getElementById('next-update').textContent = nextTime.toLocaleString();
+        } else {
+            document.getElementById('next-update').textContent = '-';
+        }
+
+        document.getElementById('playlist-size').textContent = `${data.playlist_size} items`;
+
+        // Update interval selector
+        document.getElementById('rotation-interval').value = data.interval_minutes;
+
+        // Update button states
+        const startBtn = document.getElementById('start-rotation-btn');
+        const stopBtn = document.getElementById('stop-rotation-btn');
+        const skipBtn = document.getElementById('skip-next-btn');
+
+        if (data.enabled) {
+            startBtn.disabled = true;
+            stopBtn.disabled = false;
+            skipBtn.disabled = false;
+        } else {
+            startBtn.disabled = false;
+            stopBtn.disabled = true;
+            skipBtn.disabled = true;
+        }
+
+    } catch (error) {
+        console.error('Failed to update rotation status:', error);
+    }
+}
+
+// Start Rotation
+document.getElementById('start-rotation-btn').addEventListener('click', async () => {
+    const selectedPhotos = Array.from(document.querySelectorAll('.photo-checkbox:checked'))
+        .map(cb => cb.value);
+    const includeWeather = document.getElementById('include-weather').checked;
+    const interval = parseInt(document.getElementById('rotation-interval').value);
+
+    if (selectedPhotos.length === 0 && !includeWeather) {
+        showToast('Please select at least one photo or enable weather display', 'error');
+        return;
+    }
+
+    // Build items array in the format expected by backend
+    const items = [];
+
+    // Add photo items
+    selectedPhotos.forEach(photoId => {
+        items.push({
+            type: 'photo',
+            photo_id: photoId
+        });
+    });
+
+    // Add weather item if enabled
+    if (includeWeather) {
+        items.push({
+            type: 'weather'
+        });
+    }
+
+    try {
+        const response = await fetch('/api/rotation/start', {
+            method: 'POST',
+            headers: { 'Content-Type': 'application/json' },
+            body: JSON.stringify({
+                items: items,
+                interval_minutes: interval
+            })
+        });
+
+        if (!response.ok) {
+            const error = await response.json();
+            throw new Error(error.detail || 'Failed to start rotation');
+        }
+
+        showToast('Rotation started successfully!', 'success');
+        await updateRotationStatus();
+
+    } catch (error) {
+        console.error('Start rotation error:', error);
+        showToast(error.message, 'error');
+    }
+});
+
+// Stop Rotation
+document.getElementById('stop-rotation-btn').addEventListener('click', async () => {
+    try {
+        const response = await fetch('/api/rotation/stop', {
+            method: 'POST'
+        });
+
+        if (!response.ok) {
+            throw new Error('Failed to stop rotation');
+        }
+
+        showToast('Rotation stopped', 'success');
+        await updateRotationStatus();
+
+    } catch (error) {
+        console.error('Stop rotation error:', error);
+        showToast('Failed to stop rotation', 'error');
+    }
+});
+
+// Skip to Next
+document.getElementById('skip-next-btn').addEventListener('click', async () => {
+    try {
+        const response = await fetch('/api/rotation/next', {
+            method: 'POST'
+        });
+
+        if (!response.ok) {
+            throw new Error('Failed to skip');
+        }
+
+        showToast('Skipping to next item...', 'success');
+        await updateRotationStatus();
+
+    } catch (error) {
+        console.error('Skip error:', error);
+        showToast('Failed to skip', 'error');
+    }
+});
+
+// Update Interval
+// Note: Interval is set when starting rotation, not as a separate endpoint
+document.getElementById('rotation-interval').addEventListener('change', (e) => {
+    const interval = parseInt(e.target.value);
+    // Just update the UI - the interval will be applied when rotation is started
+    showToast(`Interval will be set to ${interval} minutes when rotation starts`, 'info');
 });
 

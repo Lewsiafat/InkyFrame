@@ -358,7 +358,6 @@ uv run uvicorn src.main:app --host 0.0.0.0 --port 8000
 
 - 🔮 User authentication and multi-user support
 - 🔮 Photo albums/collections
-- 🔮 Scheduled display rotation (slideshow mode)
 - 🔮 Advanced image filters and effects
 - 🔮 Multi-display support
 - 🔮 Cloud storage integration (S3, etc.)

@@ -124,14 +124,23 @@ class RotationScheduler:
                     return
                 
                 # Display photo
-                await display_controller.display_image(optimized_path)
+                await display_controller.display_photo(optimized_path, item.photo_id)
                 logger.info(f"Displayed photo: {item.photo_id}")
                 
             elif item.type == "weather":
-                # Render and display weather
+                # Render weather to get image path
+                from .weather_service import weather_service
+                
+                # Fetch current weather and forecast
+                current = await weather_service.get_current_weather()
+                forecast = await weather_service.get_forecast()
+                
+                # Render weather image
                 renderer = WeatherRenderer()
-                weather_image = await renderer.render_weather()
-                await display_controller.display_pil_image(weather_image)
+                weather_image_path = renderer.render_weather(current, forecast, "weather_rotation")
+                
+                # Display the weather image
+                await display_controller.display_photo(weather_image_path, "weather")
                 logger.info("Displayed weather")
             
             # Move to next index

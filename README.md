@@ -22,9 +22,17 @@ A web-based application that allows users to upload photos, view weather forecas
 - 🔄 **Auto-Caching**: 30-minute cache to reduce API calls
 - 📊 **E-ink Optimized**: Clean black & white layout perfect for e-ink displays
 
+### Rotation Schedule
+- 🔄 **Automatic Rotation**: Schedule automatic rotation between photos and weather
+- ⏱️ **Flexible Intervals**: Choose rotation intervals from 5 minutes to 12 hours
+- 📋 **Playlist Builder**: Select which photos and weather to include in rotation
+- ⏭️ **Manual Controls**: Start, stop, or skip to next item anytime
+- 📊 **Status Monitoring**: Real-time display of current item and next update time
+- 💾 **State Persistence**: Rotation continues across server restarts
+
 ### General
 - ⚡ **Real-time Status**: Live display status updates
-- 🔀 **Tab Navigation**: Easy switching between Photos and Weather views
+- 🔀 **Tab Navigation**: Easy switching between Photos, Weather, and Rotation views
 - 🎯 **One-Click Display**: Send photos or weather to e-ink with one button
 
 ## Quick Start
@@ -114,6 +122,16 @@ scripts/server/restart.sh
 3. Click **"Display Weather on Inky"** to send to e-ink display
 4. Weather updates automatically (cached for 30 minutes)
 
+### Rotation Schedule
+1. Click the **🔄 Rotation** tab
+2. **Select Photos**: Check the photos you want to include in rotation
+3. **Include Weather**: Optionally enable weather display in rotation
+4. **Set Interval**: Choose rotation interval (5 min to 12 hours)
+5. **Preview Playlist**: View the rotation order before starting
+6. **Start Rotation**: Click "▶️ Start Rotation" to begin automatic rotation
+7. **Controls**: Use Stop or Skip buttons to control rotation
+8. **Status**: Monitor current item and next update time in real-time
+
 ## Project Structure
 
 ```
@@ -123,16 +141,20 @@ InkyFrame/
 │   │   ├── upload.py         # Photo upload
 │   │   ├── gallery.py        # Gallery management
 │   │   ├── display.py        # Display control
-│   │   └── weather.py        # Weather endpoints
+│   │   ├── weather.py        # Weather endpoints
+│   │   └── rotation.py       # Rotation endpoints
 │   ├── services/             # Business logic
 │   │   ├── storage.py        # File storage
 │   │   ├── image_processor.py      # Image optimization
 │   │   ├── display_controller.py   # Inky display control
 │   │   ├── weather_service.py      # OpenWeatherMap API
-│   │   └── weather_renderer.py     # Weather image generation
+│   │   ├── weather_renderer.py     # Weather image generation
+│   │   ├── rotation_scheduler.py   # Rotation scheduling
+│   │   └── rotation_state.py       # Rotation state persistence
 │   ├── models/               # Data models
 │   │   ├── photo.py          # Photo models
-│   │   └── weather.py        # Weather models
+│   │   ├── weather.py        # Weather models
+│   │   └── rotation.py       # Rotation models
 │   ├── config.py             # Configuration
 │   └── main.py               # FastAPI application
 ├── static/                   # Frontend files
@@ -197,6 +219,14 @@ InkyFrame/
 | GET | `/api/weather/forecast` | Get 5-day forecast |
 | POST | `/api/weather/display` | Display weather on Inky |
 | GET | `/api/weather/config` | Get weather configuration |
+
+### Rotation
+| Method | Endpoint | Description |
+|--------|----------|-------------|
+| GET | `/api/rotation/status` | Get rotation status |
+| POST | `/api/rotation/start` | Start rotation with playlist |
+| POST | `/api/rotation/stop` | Stop rotation |
+| POST | `/api/rotation/next` | Skip to next item |
 
 ### System
 | Method | Endpoint | Description |
