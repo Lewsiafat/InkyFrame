@@ -1,0 +1,17 @@
+[Unit]
+Description=Inky WiFi Setup App
+After=network.target
+Conflicts=inky-main.service
+
+[Service]
+Type=simple
+User=pi
+WorkingDirectory=/home/pi/Documents/workspaceEink/myInky
+ExecStart=/home/pi/Documents/workspaceEink/myInky/scripts/wifi/start_wifi_app.sh
+Restart=on-failure
+RestartSec=5
+StandardOutput=journal
+StandardError=journal
+
+[Install]
+WantedBy=multi-user.target

@@ -1,0 +1,15 @@
+[Unit]
+Description=Inky Button Monitor & Supervisor
+After=network.target
+
+[Service]
+Type=simple
+User=root
+WorkingDirectory=/home/pi/Documents/workspaceEink/myInky
+ExecStart=/home/pi/.local/bin/uv run scripts/wifi/button_monitor.py
+Restart=always
+RestartSec=5
+# Root required for systemctl commands
+
+[Install]
+WantedBy=multi-user.target

@@ -1,0 +1,28 @@
+#!/bin/bash
+set -e
+
+echo "Installing Inky WiFi App Services..."
+
+# 1. Install dependencies
+echo "Installing Python dependencies (qrcode)..."
+uv pip install qrcode[pil]
+
+# 2. Copy Service Files
+echo "Copying service files..."
+sudo cp scripts/services/inky-wifi.service /etc/systemd/system/
+sudo cp scripts/services/inky-monitor.service /etc/systemd/system/
+
+# 3. Reload Systemd
+echo "Reloading systemd..."
+sudo systemctl daemon-reload
+
+# 4. Enable Monitor (always runs)
+echo "Enabling Monitor Service..."
+sudo systemctl enable inky-monitor.service
+sudo systemctl start inky-monitor.service
+
+# 5. Disable WiFi App (managed by monitor)
+sudo systemctl disable inky-wifi.service
+
+echo "Installation Complete!"
+echo "Monitor is running. It will determine whether to start Main or WiFi app."

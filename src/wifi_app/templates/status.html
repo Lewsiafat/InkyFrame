@@ -1,0 +1,72 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <meta http-equiv="refresh" content="3">
+    <title>Inky Connection Status</title>
+    <style>
+        body {
+            font-family: sans-serif;
+            max-width: 600px;
+            margin: 0 auto;
+            padding: 20px;
+            background: #f0f0f0;
+            text-align: center;
+        }
+
+        .card {
+            background: white;
+            padding: 40px;
+            border-radius: 8px;
+            box-shadow: 0 2px 4px rgba(0, 0, 0, 0.1);
+        }
+
+        h1 {
+            color: #333;
+        }
+
+        .spinner {
+            font-size: 40px;
+            margin: 20px 0;
+        }
+
+        .success {
+            color: green;
+        }
+
+        .fail {
+            color: red;
+        }
+    </style>
+</head>
+
+<body>
+    <div class="card">
+        {% if state == 'CONNECTING' %}
+        <h1>Connecting...</h1>
+        <div class="spinner">🔄</div>
+        <p>Please wait while we connect to the network.</p>
+        <p>Check the Inky display for status.</p>
+
+        {% elif state == 'SUCCESS' %}
+        <h1 class="success">Connected!</h1>
+        <div class="spinner">✅</div>
+        <p>WiFi connection successful.</p>
+        <p>The device will now switch to the Photo Display app.</p>
+
+        {% elif state == 'FAIL' %}
+        <h1 class="fail">Connection Failed</h1>
+        <div class="spinner">❌</div>
+        <p>Could not connect to the network.</p>
+        <p>Returning to Setup Mode in a few seconds...</p>
+        <p><a href="/">Try Again</a></p>
+
+        {% else %}
+        <h1>Status: {{ state }}</h1>
+        {% endif %}
+    </div>
+</body>
+
+</html>

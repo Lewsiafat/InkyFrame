@@ -29,19 +29,19 @@ REM Upload server management scripts
 echo [4/6] Uploading server scripts...
 scp scripts/server/start.sh scripts/server/stop.sh scripts/server/restart.sh scripts/server/status.sh %REMOTE_USER%@%REMOTE_HOST%:%REMOTE_PATH%/scripts/server/
 
-REM Make scripts executable
-echo [5/6] Making scripts executable...
-ssh %REMOTE_USER%@%REMOTE_HOST% "chmod +x %REMOTE_PATH%/scripts/server/*.sh"
+:: REM Make scripts executable
+:: echo [5/6] Making scripts executable...
+:: ssh %REMOTE_USER%@%REMOTE_HOST% "chmod +x %REMOTE_PATH%/scripts/server/*.sh"
 
-REM Upload .env if exists
-echo [6/6] Uploading .env (if exists)...
-if exist .env (
-    scp .env %REMOTE_USER%@%REMOTE_HOST%:%REMOTE_PATH%/
-    echo .env uploaded - Weather API key configured!
-) else (
-    echo WARNING: .env not found! Weather feature will not work.
-    echo Create .env file with OPENWEATHER_API_KEY before deploying.
-)
+:: REM Upload .env if exists
+:: echo [6/6] Uploading .env (if exists)...
+:: if exist .env (
+::     scp .env %REMOTE_USER%@%REMOTE_HOST%:%REMOTE_PATH%/
+::     echo .env uploaded - Weather API key configured!
+:: ) else (
+::     echo WARNING: .env not found! Weather feature will not work.
+::     echo Create .env file with OPENWEATHER_API_KEY before deploying.
+:: )
 
 echo.
 echo ========================================
