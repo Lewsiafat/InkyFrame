@@ -4,9 +4,11 @@ import logging
 import sys
 from pathlib import Path
 
-# Try to import RPi.GPIO, else mock
+# Try to import gpiod (new way for Pi 5 / Bookworm)
 try:
-    import RPi.GPIO as GPIO
+    import gpiod
+    import gpiodevice
+    from gpiod.line import Bias, Direction, Edge
     GPIO_AVAILABLE = True
 except ImportError:
     GPIO_AVAILABLE = False
@@ -72,17 +74,8 @@ def switch_mode():
         else:
             run_command(f"sudo systemctl start {SERVICE_WIFI}")
 
-def setup_gpio():
-    if not GPIO_AVAILABLE:
-        logger.warning("GPIO not available - Button monitoring disabled (or Mocked)")
-        return
-    
-    GPIO.setmode(GPIO.BCM)
-    GPIO.setup(BUTTON_PIN, GPIO.IN, pull_up_down=GPIO.PUD_UP)
-
 def monitor_loop():
-    logger.info("Starting Button Monitor...")
-    setup_gpio()
+    logger.info("Starting Button Monitor (gpiod)...")
     
     # Check boot state once
     active = get_active_service()
@@ -96,43 +89,76 @@ def monitor_loop():
             run_command(f"sudo systemctl start {SERVICE_WIFI}")
 
     if not GPIO_AVAILABLE:
-        # Just sleep forever if no GPIO (or run logic for testing)
+        logger.warning("gpiod/gpiodevice not available - Button monitoring disabled")
         while True:
             time.sleep(60)
 
-    # Button Loop
-    last_state = GPIO.input(BUTTON_PIN)
-    press_start_time = None
-    
-    while True:
-        current_state = GPIO.input(BUTTON_PIN)
+    try:
+        # Setup GPIO using gpiod and gpiodevice
+        chip = gpiodevice.find_chip_by_platform()
         
-        # Button Pressed (Low)
-        if current_state == GPIO.LOW and last_state == GPIO.HIGH:
-            press_start_time = time.time()
-            logger.debug("Button Press Started")
+        # Configure the line for Button A
+        # We need both edges to detect press (falling) and release (rising)
+        # Note: Inky usually has Pull-Up, so Press = Low (Falling edge)
+        settings = gpiod.LineSettings(
+            direction=Direction.INPUT, 
+            bias=Bias.PULL_UP, 
+            edge_detection=Edge.BOTH
+        )
+        
+        # Get offset for line
+        offset = chip.line_offset_from_id(BUTTON_PIN)
+        
+        line_config = {offset: settings}
+        request = chip.request_lines(consumer="inky-monitor", config=line_config)
+        
+        logger.info(f"Monitoring Button A (GPIO {BUTTON_PIN})")
 
-        # Button Released (High)
-        elif current_state == GPIO.HIGH and last_state == GPIO.LOW:
+        press_start_time = None
+        
+        while True:
+            # Block and wait for events (timeout 1s to allow loop to check other things if needed)
+            for event in request.read_edge_events(timeout=1.0):
+                if event.line_offset == offset:
+                    
+                    # Falling Edge = Pressed (because Pull Up)
+                    if event.event_type == gpiod.EdgeEvent.Type.FALLING_EDGE:
+                        press_start_time = time.time()
+                        logger.debug("Button Pressed")
+                        
+                    # Rising Edge = Released
+                    elif event.event_type == gpiod.EdgeEvent.Type.RISING_EDGE:
+                        if press_start_time:
+                            duration = time.time() - press_start_time
+                            logger.debug(f"Button Released. Duration: {duration:.2f}s")
+                            # Check for long press on release (or check continuously?)
+                            # Checking on release is safer for simple logic, but let's check holding too
+                            press_start_time = None
+            
+            # Continuous check for long press while held
             if press_start_time:
-                duration = time.time() - press_start_time
-                logger.debug(f"Button Released. Duration: {duration:.2f}s")
-                press_start_time = None
-        
-        # Checking duration while held
-        if current_state == GPIO.LOW and press_start_time:
-            duration = time.time() - press_start_time
-            if duration > LONG_PRESS_TIME:
-                logger.info("Long Press Detected! Triggering Switch.")
-                switch_mode()
+                # We need to manually check if it's still pressed? 
+                # gpiod events are good, but if we miss one? 
+                # With read_edge_events, we rely on the state tracking.
                 
-                # Wait for release to avoid double trigger
-                while GPIO.input(BUTTON_PIN) == GPIO.LOW:
-                    time.sleep(0.1)
-                press_start_time = None
-        
-        last_state = current_state
-        time.sleep(DEBOUNCE_TIME)
+                # Check current value to be sure?
+                # request.get_value(offset) might be needed if we want to poll
+                
+                duration = time.time() - press_start_time
+                if duration > LONG_PRESS_TIME:
+                    logger.info("Long Press Detected! Triggering Switch.")
+                    switch_mode()
+                    
+                    # Reset
+                    press_start_time = None
+                    # Wait for release (we will see rising edge later, but ignore it)
+                    
+            # Heartbeat or other checks
+            
+    except Exception as e:
+        logger.error(f"GPIO Error: {e}")
+        # Sleep a bit to avoid busy loop on failure
+        time.sleep(5)
 
 if __name__ == "__main__":
     monitor_loop()
