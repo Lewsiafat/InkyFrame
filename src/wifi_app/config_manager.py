@@ -46,6 +46,14 @@ class ConfigManager:
         config = {"ssid": ssid, "password": password}
         try:
             cls.LOCAL_CONFIG_PATH.write_text(json.dumps(config, indent=2))
+            # Ensure lewsiafat can read/write it (since we might be running as root)
+            try:
+                import shutil
+                shutil.chown(cls.LOCAL_CONFIG_PATH, user="lewsiafat", group="lewsiafat")
+                cls.LOCAL_CONFIG_PATH.chmod(0o666)
+            except Exception as owner_err:
+                logger.warning(f"Could not change config ownership: {owner_err}")
+                
             logger.info(f"Saved config for {ssid}")
         except Exception as e:
             logger.error(f"Failed to save config: {e}")

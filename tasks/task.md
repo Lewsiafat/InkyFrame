@@ -12,6 +12,6 @@
 - [x] **DHCP**: Fix "Obtaining IP Address" loop. <!-- id: 5 -->
     - [x] Disable system-wide `dnsmasq` in `install_wifi.sh`. <!-- id: 6 -->
     - [x] **VERIFIED**: User confirmed it works. <!-- id: 7 -->
-- [ ] **Finalize**: Commit and Push. <!-- id: 8 -->
-    - [ ] Git add/commit. <!-- id: 9 -->
-    - [ ] Git push. <!-- id: 10 -->
+- [x] **Finalize**: Commit and Push. <!-- id: 8 -->
+    - [x] Git add/commit. <!-- id: 9 -->
+    - [x] Git push. <!-- id: 10 -->

@@ -47,8 +47,9 @@
         {% if state == 'CONNECTING' %}
         <h1>Connecting...</h1>
         <div class="spinner">🔄</div>
-        <p>Please wait while we connect to the network.</p>
-        <p>Check the Inky display for status.</p>
+        <p>Attempting to connect to the network.</p>
+        <p><strong>Note:</strong> You may lose connection to this page as the Hotspot shuts down.</p>
+        <p>Please check the Inky display for the final result.</p>
 
         {% elif state == 'SUCCESS' %}
         <h1 class="success">Connected!</h1>

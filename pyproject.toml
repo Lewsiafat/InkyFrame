@@ -15,5 +15,7 @@ dependencies = [
     "httpx>=0.26.0",
     "python-dateutil>=2.8.2",
     "python-dotenv>=1.0.0",
+    "rpi-lgpio>=0.6",
     "apscheduler>=3.10.0",
+    "inky>=2.0.0",
 ]

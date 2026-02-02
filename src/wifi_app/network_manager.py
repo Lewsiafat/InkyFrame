@@ -12,12 +12,15 @@ class NetworkManager:
     INITIAL_PASS = "inky1234" # Default password for AP, though open is also an option if desired
 
     @staticmethod
-    def run_command(cmd: List[str]) -> str:
+    def run_command(cmd: List[str], timeout: int = 30) -> str:
         """Run nmcli command and return output."""
         try:
             logger.info(f"Running command: {' '.join(cmd)}")
-            result = subprocess.run(cmd, capture_output=True, text=True, check=True)
+            result = subprocess.run(cmd, capture_output=True, text=True, check=True, timeout=timeout)
             return result.stdout.strip()
+        except subprocess.TimeoutExpired:
+            logger.error(f"Command timed out: {' '.join(cmd)}")
+            raise Exception("Command timed out")
         except subprocess.CalledProcessError as e:
             logger.error(f"Command failed: {e.stderr}")
             raise Exception(f"nmcli command failed: {e.stderr}")
@@ -73,7 +76,8 @@ class NetworkManager:
             cmd.extend(["password", password])
             
         try:
-            cls.run_command(cmd)
+            # Connect can take a while, give it 60s
+            cls.run_command(cmd, timeout=60)
             logger.info(f"Successfully connected to {ssid}")
         except Exception as e:
             logger.error(f"Failed to connect to {ssid}: {e}")
@@ -115,25 +119,32 @@ class NetworkManager:
             return []
 
     @classmethod
-    def get_ip_address(cls) -> str:
-        """Get current IP address of wlan0."""
-        # Method 1: Try 'ip' command (more reliable for active state)
-        ip = cls._get_ip_from_ip_command("wlan0")
-        if ip:
-            return ip
+    def get_ip_address(cls, retries: int = 15, delay: int = 1) -> str:
+        """Get current IP address of wlan0 with retries."""
+        import time
+        
+        for attempt in range(retries):
+            # Method 1: Try 'ip' command (more reliable for active state)
+            ip = cls._get_ip_from_ip_command("wlan0")
+            if ip:
+                return ip
+                
+            # Method 2: Fallback to nmcli
+            try:
+                output = cls.run_command(["sudo", "nmcli", "-g", "ip4.address", "dev", "show", "wlan0"])
+                # Output might be '192.168.1.100/24' or multiple lines
+                if output:
+                    # Take the first non-empty line
+                    for line in output.split('\n'):
+                        if line.strip():
+                            return line.split('/')[0]
+            except Exception:
+                pass
             
-        # Method 2: Fallback to nmcli
-        try:
-            output = cls.run_command(["sudo", "nmcli", "-g", "ip4.address", "dev", "show", "wlan0"])
-            # Output might be '192.168.1.100/24' or multiple lines
-            if output:
-                # Take the first non-empty line
-                for line in output.split('\n'):
-                    if line.strip():
-                        return line.split('/')[0]
-            return "Unknown"
-        except Exception:
-            return "Unknown"
+            if attempt < retries - 1:
+                time.sleep(delay)
+                
+        return "Unknown"
 
     @staticmethod
     def _get_ip_from_ip_command(interface: str) -> Optional[str]:

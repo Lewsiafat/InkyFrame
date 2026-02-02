@@ -1,5 +1,6 @@
 import asyncio
 import logging
+from pathlib import Path
 from enum import Enum
 from fastapi import FastAPI, Request, BackgroundTasks
 from fastapi.templating import Jinja2Templates
@@ -70,12 +71,16 @@ class StateMachine:
         elif new_state == AppState.CONNECTING:
             ssid = kwargs.get('ssid')
             password = kwargs.get('password')
-            wifi_display.show_connecting(ssid)
+            try:
+                wifi_display.show_connecting(ssid)
+            except Exception as e:
+                logger.error(f"Display update failed: {e}")
             
             try:
                 # Try to connect
                 NetworkManager.connect_to_wifi(ssid, password)
                 # If no exception, we are connected. Check IP.
+                # get_ip_address now has internal retries
                 ip = NetworkManager.get_ip_address()
                 if ip and ip != "Unknown":
                     await self.transition_to(AppState.SUCCESS, ssid=ssid, ip=ip)
@@ -88,13 +93,17 @@ class StateMachine:
         elif new_state == AppState.SUCCESS:
             ssid = kwargs.get('ssid')
             ip = kwargs.get('ip')
-            wifi_display.show_success(ssid, ip)
+            try:
+                wifi_display.show_success(ssid, ip)
+            except Exception as e:
+                logger.error(f"Display update failed: {e}")
+            
             # Save config now that it works
             # (If it came from file, it's already saved, but good to be sure)
             
             # Wait a moment then exit to let supervisor start Main App
-            logger.info("Connection successful. Exiting in 5 seconds...")
-            await asyncio.sleep(5)
+            logger.info("Connection successful. Exiting in 15 seconds...")
+            await asyncio.sleep(15)
             # Exit with specific code to tell supervisor "Switch to Main"
             import sys
             sys.exit(0) 
@@ -102,7 +111,11 @@ class StateMachine:
         elif new_state == AppState.FAIL:
             ssid = kwargs.get('ssid')
             error = kwargs.get('error')
-            wifi_display.show_fail(ssid, error)
+            try:
+                wifi_display.show_fail(ssid, error)
+            except Exception as e:
+                logger.error(f"Display update failed: {e}")
+            
             await asyncio.sleep(5)
             # Revert to AP Mode
             await self.transition_to(AppState.AP_MODE)
